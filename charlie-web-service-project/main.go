@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	// do go build .
+	// do go build.
 	// windows: run stonks.exe and put https://localhost:3000 in browser.
 	// unix: ./stonks and put https://localhost:3000 in browser.
 	controllers.RegisterControllers()
