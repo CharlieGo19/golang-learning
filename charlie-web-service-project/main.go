@@ -4,17 +4,17 @@ package main
 // Package is just a directory that contains discrete units of code for some sort fo concept.
 
 import (
-	"fmt"
+	"net/http"
 
-	"charlie.web.service/stonks/heroes"
+	"charlie.web.service/stonks/controllers"
 )
 
 func main() {
-	var heroOne heroes.Hero = heroes.Hero{
-		ID:         2,
-		HeroName:   "Geralt of Rivia",
-		HeroAlias:  "The Witcher",
-		HeroRating: 1000000,
-	}
-	fmt.Println(heroOne.HeroName, "is a solid", heroOne.HeroRating)
+	// do go build .
+	// windows: run stonks.exe and put https://localhost:3000 in browser.
+	// unix: ./stonks and put https://localhost:3000 in browser.
+	controllers.RegisterControllers()
+	// look at front controller back controller pattern to understand the next line.
+	// this spins up this application based on controllers defined (see line 13)
+	http.ListenAndServe(":3000", nil)
 }
