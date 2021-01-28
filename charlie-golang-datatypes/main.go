@@ -45,6 +45,17 @@ func main() {
 	fmt.Printf("%s has a benis size of %d inches! Hot damn, how does that boy walk.\n", newFrank.ReturnFullName(), newFrank.BenisSize)
 	fmt.Printf("The character %s aka %s is %d years old. The actors insta can be found at: %s.\n", *gName, *gAlias, *gAge, *gInsta)
 
+	// So my intention here was to demonstrate behind the scenes (in humanoid.go) how you can have embedded interfaces and structs
+	// I kind of got carried away, but, you can see, if some structs/interfaces have common elements we can manipulate behind the scenes
+	// To have more readable code! Jk, it's fuckin awful feature.
+	// I probably will get used to it and apply it properly.
+	// Requires your own reading on the topic, I understand it, but not really applied it right and cba to change my code now :(.
+	// Because it returns a Humanoid type canadian requires casting to access nhsID as memory layout of Humanoid != CanzukHuman
+	var canadian organisation.CanzukHuman = organisation.NewHuman(1, "canzuk", "Canada", "Jig", "Bee").(organisation.CanzukHuman)
+	canadian.SetNHSid(1000)
+	fmt.Println(canadian.GetNHSid())
+	fmt.Printf("%s is from %s, their Goverment ID is: %d\n", canadian.ReturnName(), canadian.ReturnCountry(), canadian.ReturnID())
+
 }
 
 func checkIfNil(err error) {

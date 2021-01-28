@@ -21,16 +21,22 @@ type SuperNaturalEntity interface {
 	ReturnFullAlias() string
 }
 
+type Identifiable interface {
+	Bumhole() string
+}
+
 type Name struct {
 	firstName  string
 	secondName string
 }
 
 // Villian has CatchPhrase to distinguish itself from AntiHero
+// Can embed interface in structs & interfaces!
 type Villian struct {
 	Name
 	alias       string
 	CatchPhrase string
+	Identifiable
 }
 
 // AntiHero has BenisSize to distinguish itself from Villian
