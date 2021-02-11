@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"math"
+
+	"charlie.advanced.function/control/versioncontrol"
 )
 
 func main() {
@@ -30,6 +32,49 @@ func main() {
 	var numbers []int = []int{1, 2, 3, 4, 5}
 	total2 := sum("Clarke", numbers...)
 	fmt.Printf("The sum of your values is: %v\n", total2)
+
+	// The below is to demonstrate method receivers, please look at vcontrol.go.
+	sv := versioncontrol.NewSemanticVersion(1, 2, 3)
+	println(sv.String())
+	// So lets increment our version, because we've made a big change.
+	sv.IncrementMajor()
+	// Let's print out our result! Spoiler, we know this won't work, check vcontrol.go to see why.
+	println(sv.String())
+	// Let's increement it for real!
+	sv.IncrementMajorPointer()
+	// Praise these walls! AOT reference for all y'all nerds.
+	fmt.Printf("%s, See comments as to why previous increment didn't work!\n", sv.String())
+	// Note: if you get $x method had pointer reciever, don't forget to prepend &, as you want to send the pointer.
+
+	// An anonymous function can be defined and executed inline.
+	func() {
+		fmt.Println("Hello World, from within an anonymous function, aka a function literal.")
+	}()
+
+	// Anonymous functions can also be assigned to variables.
+	anonymousFunction := func() {
+		fmt.Println("Hello, good Sur.")
+	}
+	anonymousFunction()
+
+	// Anonymous functions can also take arguements!
+	anonymousFunctionB := func(value string) {
+		fmt.Printf("I, a self aware QanonFunction, notify thee, that I have recieved: %s.\n", value)
+	}
+	anonymousFunctionB("Batshit conspiracies")
+	anonymousFunctionB("The pee pee tape")
+	anonymousFunctionB("Donald J Trump's nudes")
+
+	// Just like normal functions, anonymous functions can also return types.
+	anonymousFunctionC := func(value string) string {
+		return fmt.Sprintf("%s has huge feet, hot damn.", value)
+	}
+	fmt.Println(anonymousFunctionC("RT"))
+
+	// Note: Anonymous functions can also be stateful.
+	// Note: Defer functions exhibit stack like behaviour, i.e. FIFO.
+	// Note: You can recover from panics using recover()
+
 }
 
 // Two simple functions, just demonstrating how to define a function.
@@ -64,6 +109,7 @@ func sum(name string, values ...int) int {
 
 // To demonstrate control flow.
 // Name your return variable, then have a blank return, this allows the entire function to be evaluated.
+// Use this sparringly and only when you have a genuine use case for it.
 func divideControl(parameterOne, parameterTwo float64) (result float64, remainder float64, err error) {
 	if parameterTwo == 0 {
 		err = errors.New("you cannot divide by zero, go back to school!")
