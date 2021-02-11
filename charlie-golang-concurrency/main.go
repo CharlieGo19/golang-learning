@@ -14,7 +14,7 @@ var rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 func main() {
 
 	// Note: Concurrency is multiple tasks that need to be done, with no order preference.
-	// Note: Parallelism is concurrency, but the facility to complete all tasks in parallel (at the same time).
+	// Note: Parallelism is concurrency, but the facility to complete tasks in parallel (at the same time).
 
 	// We're doing some random queries.
 	for i := 0; i < 10; i++ {
