@@ -70,7 +70,7 @@ func main() {
 				// However, it is a really good demonstration of channels.
 				<-dbChannel
 			case b := <-dbChannel:
-				fmt.Println("Fetch result from database:")
+				fmt.Println("Fetched result from database:")
 				fmt.Println(b)
 			}
 
