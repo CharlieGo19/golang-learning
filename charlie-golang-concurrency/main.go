@@ -24,6 +24,12 @@ func main() {
 	waitGroup := &sync.WaitGroup{}
 	mutex := &sync.RWMutex{}
 
+	// In this example we need to control the output that is displayed on the command line.
+	// Here we are using channels, it is to demonstrate how one could use them.
+	// There is a better way to achieve this, by making query to db conditional on query to cache.
+	cacheChannel := make(chan Book)
+	dbChannel := make(chan Book)
+
 	// We're doing some random queries.
 	for i := 0; i < 10; i++ {
 		// Random + 1 to ensure that we do not get 0, as our books start at 1.
@@ -32,23 +38,44 @@ func main() {
 		waitGroup.Add(2)
 		// Create an anonymous function so that we can run a query on the cache in parralel to the db.
 		// We pass the id in as an arguement to avoid memory mapping issues.
-		go func(id int, waitGroup *sync.WaitGroup, mutex *sync.RWMutex) {
+		// We pass in cacheChannel as send only! This is denoted by arrow being on the right side of the chan.
+		go func(id int, waitGroup *sync.WaitGroup, mutex *sync.RWMutex, cacheChannel chan<- Book) {
 			// Assign results of queryCache to b, ok; if ok then do the thing.
 			if b, ok := queryCache(id, mutex); ok {
-				fmt.Println("Found entry in cache.")
-				fmt.Println(b)
+				cacheChannel <- b
 			}
 			waitGroup.Done()
-		}(id, waitGroup, mutex)
-		go func(id int, waitGroup *sync.WaitGroup, mutex *sync.RWMutex) {
+		}(id, waitGroup, mutex, cacheChannel)
+		go func(id int, waitGroup *sync.WaitGroup, mutex *sync.RWMutex, dbChannel chan<- Book) {
 			// If we don't find it cached, then we have to query the database.
 			if b, ok := queryDatabase(id, mutex); ok {
-				fmt.Println("Had to hit the database.")
-				fmt.Println(b)
+				dbChannel <- b
 			}
 			waitGroup.Done()
-		}(id, waitGroup, mutex)
-		// Allow stuff to be put in cache.
+		}(id, waitGroup, mutex, dbChannel)
+
+		// We now pass the channels as a reciever, so arrow on the left.
+		// Note: All channels need a send and a reciever.
+		// Considering the above comment, we place the recieve inside of the loop as we need to recieve...
+		// ten lots of messages because ten are sent, if we don't all hell will break loose.
+		go func(cacheChannel, dbChannel <-chan Book) {
+			select {
+			case b := <-cacheChannel:
+				fmt.Println("Found result in the cache:")
+				fmt.Println(b)
+				// Because we always hit the database, we need to consume the message.
+				// Therefore we just dump it here, otherwise we will get duplicates on the output.
+				// As the below case would be triggered as it will see the message.
+				// As I mentioned in the comments earlier, there would be better ways of doing this...
+				// However, it is a really good demonstration of channels.
+				<-dbChannel
+			case b := <-dbChannel:
+				fmt.Println("Fetch result from database:")
+				fmt.Println(b)
+			}
+
+		}(cacheChannel, dbChannel)
+		// Allow stuff to be put in cache. I don't like this... Should I find another solution?
 		time.Sleep(150 * time.Millisecond)
 	}
 	waitGroup.Wait()
